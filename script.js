@@ -1,9 +1,5 @@
-dt()
-const KEY = "出席君カスタム_科目";
-const KEY_STYLE = "出席君カスタム_装飾";
 
-
-const lectureList = $$("form:has(.subject-button)").map(e=>e.textContent);
+const KEY = ``;
 // console.log(lectureList);
 
 const default_lectureTimeMap = {
@@ -19,82 +15,92 @@ const default_lectureTimeMap = {
   "情報数学Ⅱ": "水5",
   "2026プログラミング実践I": "月45",
 };
+const src = `2026年度　1年生 (新2年生) 基礎ゼミ・演習の募集
+2026_R0804zenki_cc_KiZm_基礎ゼミ_ITエンジニア
+R8情報処理技術演習1(iﾊﾟｽ対策)【水・3限・NW必修】
+R8[前期・水曜日・1時限]　ビジネスプログラミング　（プラマンタ）
+2026前、初級韓国語
+2026_統計学入門
+2026_R0804zenki_c05fri03_NwApp_ネットワークアプリケーション構築
+2026_経営情報学Ⅰ
+2026_情報数学Ⅱ
+2026_データベース論
+2026_特別実習・講義（情報）アプリ共同開発実践
+2026プログラミング実践I
+2026年　法学
+経済学2026
+Webシステム
+2026_R0804zenki_c04thu03_KiZE_ITエンジニア合同
+政治学　令和7（2025）年度後期 　月曜２限目
+2025_インターンシップ実習`.split("\n");
 
-// 現在の時限を返す（いずれでもない時間の時は、0を返す）
-function getPeriod(){
-  const d = new Date()
-  const h = d.getHours()
-  const m = d.getMinutes()
+const dst = `基礎ゼミ・演習の募集
+基礎ゼミ・演習
+情報処理技術演習1(iﾊﾟｽ対策)
+ビジネスプログラミング
+初級韓国語
+統計学入門
+ネットワークアプリケーション構築
+経営情報学Ⅰ
+情報数学Ⅱ
+データベース論
+アプリ共同開発実践
+プログラミング実践I
+法学
+経済学
+Webシステム
+基礎ゼミ
+政治学_2025
+インターンシップ実習`.split("\n");
 
-  const ranges = [
-    { id: "1限目", start: "08:50", end: "10:20" },
-    { id: "2限目", start: "10:30", end: "12:00" },
-    { id: "3限目", start: "12:50", end: "14:20" },
-    { id: "4限目", start: "14:30", end: "16:00" },
-    { id: "5限目", start: "16:10", end: "17:40" },
-  ];
+const convert = str => dst[src.indexOf(str)]
 
-  // 現在時刻（例：new Date()）
-  // const now = new Date("2025 12 1 11:00");
-  const now = new Date();
-  const nowMin = now.getHours() * 60 + now.getMinutes();
-
-  // HH:MM → 分に変換
-  const toMinutes = (timeStr) => {
-    const [h, m] = timeStr.split(":").map(Number);
-    return h * 60 + m - 5;
-  };
-
-  // 判別
-  const matched = ranges.find(({ start, end }) => {
-    const s = toMinutes(start);
-    const e = toMinutes(end);
-
-    // 通常の範囲（例 6:00〜9:00）
-    if (s < e) {
-      return s <= nowMin && nowMin < e;
-    }
-
-    // 跨ぐ範囲（例 23:00〜6:00）
-    return nowMin >= s || nowMin < e;
-  });
-  // console.log(matched?.id || "時間外");
-  return matched?.id || 0;
-}
-
-// 今日の曜日を返す
-function getDay() {
-  return "月火水木金"[new Date().getDay() - 1] + "曜日";
+function update(e) {
+  console.log("update by GCcuctom!")
+  $$(`div[aria-label="登録科目"] > a:not([aria-label="ToDo"])`)
+  .map(e=>$("div:nth-child(3) > div", e))
+  .map(e=>[e, e.textContent])
+  .map(([e, txt]) => {
+    e.textContent = convert(txt);
+    // e.append(create("input", null, { type: "text", value: txt, events: {change: update } }));
+    return e;
+  })
+  $$(`div[aria-label="登録科目"] > a:not([aria-label="ToDo"])`)
+    .map(e=>$("div:nth-child(3) > div:nth-child(2)", e))
+    .filter(Boolean)
+    .map(e=>e.remove())
 }
 
 (async function(){
-console.log(getDay(), getPeriod())
-  const raw = (await chrome.storage.local.get(KEY))[KEY] ||[];
-console.log("KEY:", KEY, ", raw:", raw);
+  // const raw = (await chrome.storage.local.get(KEY))[KEY] || [];
+  document.body.append(create("button", "変更", { style: {position:"fixed",top:"100px",right:"50px",zIndex:"10000"}, events: {click: update}}))
+  return;
+console.log("aiueo")
+  $$(`div[aria-label="登録科目"] > a:not([aria-label="ToDo"])`)
+    .map(e=>$("div:nth-child(3) > div", e))
+    .map(e=>e.textContent = "")
+
+  $$(`div[aria-label="登録科目"] > a:not([aria-label="ToDo"])`)
+    .map(e=>$("div:nth-child(3) > div", e))
+    .map(e=>[e, e.textContent])
+    .map(([e, txt]) => {
+      e.textContent = "";
+      e.append(create("input", null, { type: "text", value: txt, events: {change: update } }));
+      return e;
+    })
+
+  return;
+
+
+  console.log("KEY:", KEY, ", raw:", raw);
   const [lecture, ..._] = raw.split(/(?<=限目),/)
     .map(e=>e.split(","))
     .filter(([lecture, day, time]) => day == getDay() && time == getPeriod())
     // .map(([lecture, day, time]) => console.log("arrayResult:", lecture, day, time))
     .map(([lecture, day, time]) => lecture);
-console.log(lecture)
+
   const target = $$("form:has(.subject-button)")
     .filter(e=>e.textContent==lecture)[0]
-  console.log(target)
-  dp(target)
   if(!target) return;
-    // .map(e=>e.style.backgroundColor="red");
-  // target.style.backgroundColor = "red";
-  const raw_style = (await chrome.storage.local.get(KEY_STYLE))[KEY_STYLE] || [];
-  console.log("raw_style", raw_style)
-  // (async function(){
-    raw_style.split(",")
-      .map(e => e.split(":"))
-      .map(([k, v]) => target.style[k] = v);
-  // })();
-/*  const t = raw_style.split(",")
-    .map(e => e.split(":"))
-    .reduce((a, [k, v]) => Object.assign({ [k]: v }, a), {})
-  append("body", create("style", ))*/
-console.log(t)
 })()
 

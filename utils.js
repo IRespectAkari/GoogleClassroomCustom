@@ -58,8 +58,9 @@ function createInputLabel(type, child = null, options = {}) {
 };
 
 const debugState = { DEBUGMODE: false };
-const dt = _=>DEBUGMODE = true;//  set True
-const df = _=>DEBUGMODE = false;// set false
+const dt = _=>debugState.DEBUGMODE = true;//  set True
+const df = _=>debugState.DEBUGMODE = false;// set false
+const gs = _=>debugState.DEBUGMODE;// get debugState
 const pd = _=>console.log("DEBUGMODE:", DEBUGMODE);// print DEBUGMODE
 const dp = (...args)=>{if(debugState.DEBUGMODE) console.log(args)};// debug print
 
@@ -141,7 +142,7 @@ function create(tagName = "div", children = [], options = {}) {
         break;
 
       default:// 上記以外
-        if(DEBUGMODE) console.trace(key, value);
+        if(gs()) console.trace(key, value);
         try {
           element[key] = value;
         } catch (e) {}// 適用できないオプションは無視

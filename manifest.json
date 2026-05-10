@@ -1,12 +1,12 @@
 {
-  "name": "出席君カスタム",
-  "description": "出席君の表示を改造し、使いやすくします",
+  "name": "GoogleClassroom カスタム",
+  "description": "GoogleClassroomを改造し、使いやすくします",
   "version": "0.0.1",
   "manifest_version": 3,
   "content_scripts": [
     {
       "matches": [
-        "https://kiis.one/home.php"
+        "https://classroom.google.com/*"
       ],
       "js": [
         "utils.js",

@@ -1,0 +1,14 @@
+#lectures, #styles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  .lecture, .style {
+    display: flex;
+    gap: 0.5em;
+
+    input {
+      width: 17em;
+    }
+  }
+}

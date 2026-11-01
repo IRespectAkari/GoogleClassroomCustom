@@ -1,7 +1,7 @@
 {
   "name": "GoogleClassroom カスタム",
   "description": "GoogleClassroomを改造し、使いやすくします",
-  "version": "0.0.1",
+  "version": "0.5.0",
   "manifest_version": 3,
   "content_scripts": [
     {

@@ -6,6 +6,7 @@
     "2026_R0810kouki_c03wed04_OS_オペレーティングシステム論": "オペレーティングシステム論",
     "2026_Routing": "ルーティング技術",
     "R8[後期水曜1時限] 人工知能 (プラマンタ)": "人工知能",
+    "R8[後期月曜4時限と5時限] プログラミング　実践 II (プラマンタ)": "プログラミング実践2",
     "2026_経営情報学Ⅱ": "経営情報学Ⅱ",
     "2026後期、中級韓国語": "中級韓国語",
     "R8[後期月曜4時限と5時限] プログラミング 実践 II (プラマンタ)": "プログラミング実践 II",
@@ -58,7 +59,7 @@
   };
 
   const updateCourses = () => {
-    const links = document.querySelectorAll('div[aria-label="登録科目"] > a:not([aria-label="ToDo"])');
+    const links = document.querySelectorAll('[aria-label="登録科目"] > a:not([aria-label="ToDo"])');
 
     links.forEach((link) => {
       const target = link.querySelector("& > div:last-child div:first-child");

@@ -45,6 +45,23 @@
     "book": "#ffa3a3",
     "assignment": "#b7b7ff",
   };
+  const styles = {
+    "assignment": {
+      // 課題：オレンジ系
+      borderLeft: "4px solid #e67e22",
+      bgColor: "rgba(230, 126, 34, 0.06)",
+    },
+    "book": {
+      // 資料：グリーン系
+      borderLeft: "4px solid #2e7d32",
+      bgColor: "rgba(46, 125, 50, 0.06)",
+    },
+    "": {
+      // お知らせ・その他投稿：パープル系（控えめ）
+      borderLeft: "4px solid #7e57c2",
+      bgColor: "rgba(126, 87, 194, 0.04)",
+    },
+  };
 
 
   const cleanStream = () => {
@@ -84,12 +101,12 @@
   };
 
   const colorizeStream = () => {
-    $$(`div[data-stream-item-id]:has(div[role="link"])`)
-      .filter(e=>/assignment|book/.test(e.querySelector("i").textContent))
-      .map(e=> {
-        const color = colorMap[e.querySelector("i").textContent];
-        e.style.backgroundColor = color;
-      });
+    $$('div[data-stream-item-id]:has(div[role="link"])').forEach((e) => {
+      const icon = e.querySelector("i")?.textContent.trim();
+      if (icon in colorMap && e.style.backgroundColor !== colorMap[icon]) {
+        e.style.backgroundColor = colorMap[icon];
+      }
+    });
   };
 
   const runAll = () => {

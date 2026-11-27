@@ -84,6 +84,25 @@ function update(e) {
   return;
 })();
 
+(() => {
+  const f = () => {
+    const items = document.querySelectorAll('div[data-stream-item-id]:has(div[role="link"])');
+    const spans = [...items].flatMap((e) => [...e.querySelectorAll("span")]);
+
+    spans.forEach((e) => {
+      // if (e.dataset.renamed === "1") return;
+      if (!e.textContent.includes("さんが新しい")) return;
+
+      const next = e.textContent.replace(/.+さんが新しい(.+)を投稿しました/, "$1");
+      if (next !== e.textContent) {
+        e.textContent = next;
+        e.dataset.renamed = "1";
+      }
+    });
+  };
+
+  setInterval(f, 500);
+})();
 
 
 // ↓以下無効化中 ---------------------------------------------------

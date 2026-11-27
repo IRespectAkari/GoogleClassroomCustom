@@ -69,12 +69,25 @@ const dp = (...args)=>{if(debugState.DEBUGMODE) console.log(args)};// debug prin
 function addChild(parent, children) {
   if (!Array.isArray(children)) children = [children].flat(Infinity);
 
-  children.filter(e=>e).forEach(e => {
-    if ("string" === typeof e || 'number' === typeof e) {
-      String(e).split("\n").forEach(E => parent.appendChild(document.createTextNode(E)));
-    } else {
-      element.appendChild(e);
-    }
+  children
+    .filter(e => e !== null && e !== undefined)
+    // .filter(e=>e)
+    .forEach(e => {
+      if ("string" === typeof e || 'number' === typeof e) {
+        String(e).split("\n").forEach(E => parent.appendChild(document.createTextNode(E)));
+      } else {
+        parent.appendChild(e);
+      }
+    });
+}
+
+// スタイルの適用
+function setStyles(element, styles) {
+  Object.entries(styles).forEach(([key, value]) => {
+    // キャメルケース（backgroundColor）をケバブケース（background-color）に変換
+    const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+
+    element.style.setProperty(cssKey, value);
   });
 }
 
@@ -91,14 +104,18 @@ function create(tagName = "div", children = [], options = {}) {
   const element = document.createElement(tagName);
 
   // 子要素の追加
-  if (!Array.isArray(children)) children = [children].flat(Infinity);
-  children.filter(e=>e).forEach(e => {
-    if ("string" === typeof e || 'number' === typeof e) {
-      String(e).split("\n").forEach(E => element.appendChild(document.createTextNode(E)));
-    } else {
-      element.appendChild(e);
-    }
-  });
+  addChild(element, children);
+  // if (!Array.isArray(children)) children = [children].flat(Infinity);
+  // children
+  //   .filter(e => e !== null && e !== undefined)
+  //   // .filter(e=>e)
+  //   .forEach(e => {
+  //     if ("string" === typeof e || 'number' === typeof e) {
+  //       String(e).split("\n").forEach(E => element.appendChild(document.createTextNode(E)));
+  //     } else {
+  //       element.appendChild(e);
+  //     }
+  //   });
 
 
   for (let [key, value] of Object.entries(options)) {
@@ -132,7 +149,8 @@ function create(tagName = "div", children = [], options = {}) {
         break;
 
       case "style":// style: { color: "red", maxHeight: "100px" }
-        if ("object" === typeof value) Object.assign(element.style, value);
+        // if ("object" === typeof value) Object.assign(element.style, value);
+        if ("object" === typeof value) setStyles(element, value);
         break;
 
       case "color":
@@ -148,7 +166,6 @@ function create(tagName = "div", children = [], options = {}) {
         } catch (e) {}// 適用できないオプションは無視
     }
   }
-
 
   return element;
 }
@@ -250,4 +267,23 @@ function strToObj(str, split1 = ",", split2 = ":") {
   return str.split(split1)
     .map(s => s.split(split2))
     .reduce((a, [k, v]) => Object.assign({ [k]: v }, a), {});
+}
+
+
+function getRadioChecked(name, formSelector) {
+  return $(formSelector).elements[name].value;
+}
+
+// ジェネレータ関数
+function* toggleGen(a, b) {
+  while (true) {
+    yield a;
+    yield b;
+  }
+}
+
+// 2次配列の転置処理（縦横入れ替え）
+function transpose(arr) {
+  return arr[0]
+    .map((col, i) => arr.map((row) => row[i]));
 }

@@ -8,7 +8,7 @@
     "R8[後期水曜1時限] 人工知能 (プラマンタ)": "人工知能",
     "2026_経営情報学Ⅱ": "経営情報学Ⅱ",
     "2026後期、中級韓国語": "中級韓国語",
-    "R8[後期月曜4時限と5時限] プログラミング　実践 II (プラマンタ)": "プログラミング実践 II",
+    "R8[後期月曜4時限と5時限] プログラミング 実践 II (プラマンタ)": "プログラミング実践 II",
     "2026_統計学": "統計学",
     "2026_R0810kouki_c05fri03_NwApp_ネットワークアプリケーション構築": "後期_ネットワークアプリケーション構築",
     "2026_R0810kouki_c04thu03_KiZE_ITエンジニア合同": "基礎ゼミ_後期",
@@ -41,37 +41,41 @@
     "モバイルネットワーク": "モバイルネットワーク",
   };
 
+  const colorMap = {
+    "book": "#ffa3a3",
+    "assignment": "#b7b7ff",
+  };
+
+
   const cleanStream = () => {
     const items = document.querySelectorAll('div[data-stream-item-id]:has(div[role="link"])');
-    const spans = [...items].flatMap((e) => [...e.querySelectorAll("span")]);
+    items.forEach((item) => {
+      item.querySelectorAll("span").forEach((span) => {
+        if (span.children.length > 0) return;
+        const raw = span.textContent;
+        if (!raw || !raw.includes("さんが新しい")) return;
 
-    spans.forEach((e) => {
-      if (e.dataset.renamed === "1") return;
-      if (!e.textContent.includes("さんが新しい")) return;
-
-      const next = e.textContent.replace(/.+さんが新しい(.+)を投稿しました/, "$1");
-      if (next !== e.textContent) {
-        e.textContent = next;
-        // e.dataset.renamed = "1";
-      }
+        const next = raw.replace(/.+さんが新しい(.+)を投稿しました/, "$1");
+        if (next !== raw) {
+          span.textContent = next;
+        }
+      });
     });
   };
 
   const updateCourses = () => {
     const links = document.querySelectorAll('[aria-label="登録科目"] > a:not([aria-label="ToDo"])');
-
     links.forEach((link) => {
       const target = link.querySelector("& > div:last-child div:first-child");
-      if (!target || target.dataset.courseUpdated === "1") return;
+      if (!target) return;
 
       const txt = target.textContent.trim();
       if (!Object.prototype.hasOwnProperty.call(data, txt)) return;
 
       const next = data[txt];
-      if (next !== target.textContent) {
+      if (next && next !== target.textContent) {
         target.textContent = next;
       }
-      // target.dataset.courseUpdated = "1";
 
       if (target.parentNode && target.parentNode.childElementCount !== 1) {
         target.parentNode.lastElementChild?.remove();
@@ -79,9 +83,19 @@
     });
   };
 
+  const colorizeStream = () => {
+    $$(`div[data-stream-item-id]:has(div[role="link"])`)
+      .filter(e=>/assignment|book/.test(e.querySelector("i").textContent))
+      .map(e=> {
+        const color = colorMap[e.querySelector("i").textContent];
+        e.style.backgroundColor = color;
+      });
+  };
+
   const runAll = () => {
     cleanStream();
     updateCourses();
+    colorizeStream();
   };
 
   let scheduled = false;
@@ -94,7 +108,7 @@
     });
   };
 
-  const startObserver = () => {
+  const start = () => {
     if (!document.body) return;
     runAll();
 
@@ -109,12 +123,9 @@
     });
   };
 
-  runAll();
-
-
   if (document.body) {
-    startObserver();
+    start();
   } else {
-    document.addEventListener("DOMContentLoaded", startObserver, { once: true });
+    document.addEventListener("DOMContentLoaded", start, { once: true });
   }
 })();
